@@ -4,7 +4,7 @@
 Formatador ABNT Desktop
 Aplicativo para formatação automática de documentos conforme normas ABNT
 Autor: Claude AI
-Versão: 1.0
+Versão: 2.0 - Correções críticas aplicadas
 """
 
 import tkinter as tk
@@ -18,76 +18,109 @@ from datetime import datetime
 
 
 class FormatadorCitacoes:
-    """Classe responsável por converter citações para o padrão ABNT NBR 10520:2023"""
+    """
+    Classe responsável por formatar citações conforme ABNT NBR 10520:2023
+
+    REGRA PRINCIPAL ABNT:
+    - Citações entre parênteses: SOBRENOME em MAIÚSCULAS → (SILVA, 2022)
+    - Citações fora de parênteses: Sobrenome com inicial maiúscula → Silva (2022)
+    - et al.: sempre em minúsculas e itálico → et al.
+    """
 
     @staticmethod
-    def converter_citacao_maiuscula_para_minuscula(texto):
+    def converter_citacoes_para_maiusculas(texto):
         """
-        Converte citações de SOBRENOME para Sobrenome (inicial maiúscula)
+        Converte citações entre parênteses para MAIÚSCULAS (padrão ABNT correto)
+
         Exemplos:
-            (SILVA, 2022) -> (Silva, 2022)
-            FREIRE (2021) -> Freire (2021)
-            (SANTOS; OLIVEIRA, 2020) -> (Santos; Oliveira, 2020)
+            (Silva, 2022) -> (SILVA, 2022)
+            (santos, 2020) -> (SANTOS, 2020)
+            (Junior, 2024) -> (JUNIOR, 2024)
+            (Oliveira; Costa, 2021) -> (OLIVEIRA; COSTA, 2021)
         """
 
-        # Padrão 1: (SOBRENOME, ano) ou (SOBRENOME et al., ano)
-        def substituir_parenteses(match):
-            conteudo = match.group(1)
-            # Processa cada autor separado por ponto e vírgula
-            autores = conteudo.split(';')
+        def substituir_citacao_parenteses(match):
+            conteudo_original = match.group(1)
+
+            # Processa cada autor (separados por ponto e vírgula)
+            autores = conteudo_original.split(';')
             autores_formatados = []
 
             for autor in autores:
                 autor = autor.strip()
-                # Verifica se tem "et al."
-                if 'ET AL' in autor.upper():
-                    # Substitui ET AL por et al. (em itálico será feito no Word)
-                    autor = re.sub(r'\bET\s+AL\.?', 'et al.', autor, flags=re.IGNORECASE)
 
-                # Converte SOBRENOME para Sobrenome
-                partes = autor.split(',')
-                if len(partes) >= 1:
+                # Separa o nome do ano/página
+                partes = re.split(r'(,\s*\d{4})', autor, maxsplit=1)
+
+                if len(partes) >= 2:
                     nome_parte = partes[0].strip()
-                    # Converte cada palavra para capitalize
-                    palavras = nome_parte.split()
-                    palavras_formatadas = []
-                    for palavra in palavras:
-                        if palavra.upper() not in ['ET', 'AL', 'AL.']:
-                            palavras_formatadas.append(palavra.capitalize())
-                        else:
-                            palavras_formatadas.append(palavra.lower())
-                    partes[0] = ' '.join(palavras_formatadas)
-                    autor = ', '.join(partes)
+                    resto = ''.join(partes[1:])  # ano e página se houver
 
-                autores_formatados.append(autor)
+                    # Processa cada palavra do nome
+                    palavras = nome_parte.split()
+                    palavras_maiusculas = []
+
+                    for palavra in palavras:
+                        # Mantém "et al." em minúsculas
+                        if palavra.lower() in ['et', 'al', 'al.']:
+                            palavras_maiusculas.append(palavra.lower())
+                        else:
+                            # Converte para MAIÚSCULAS
+                            palavras_maiusculas.append(palavra.upper())
+
+                    autor_formatado = ' '.join(palavras_maiusculas) + resto
+                    autores_formatados.append(autor_formatado)
+                else:
+                    # Se não conseguiu separar, converte tudo para maiúsculas
+                    palavras = autor.split()
+                    palavras_maiusculas = []
+                    for palavra in palavras:
+                        if palavra.lower() in ['et', 'al', 'al.']:
+                            palavras_maiusculas.append(palavra.lower())
+                        else:
+                            palavras_maiusculas.append(palavra.upper())
+                    autores_formatados.append(' '.join(palavras_maiusculas))
 
             return f"({'; '.join(autores_formatados)})"
 
-        # Aplica conversão em citações entre parênteses
-        texto = re.sub(r'\(([A-ZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ][A-ZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ\s;,]+(?:et al\.)?[,\s]+\d{4}[a-z]?(?:\s*;\s*[A-ZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ][A-ZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ\s]+,\s*\d{4}[a-z]?)*(?:,\s*p\.\s*\d+(?:-\d+)?)?)\)',
-                      substituir_parenteses, texto)
+        # Padrão para citações entre parênteses com ano
+        # Captura: (Nome, 2022) ou (Nome; Outro, 2022, p. 10)
+        padrao = r'\(([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ\s,;]+\d{4}[a-z]?(?:,\s*p\.\s*\d+(?:-\d+)?)?)\)'
+        texto = re.sub(padrao, substituir_citacao_parenteses, texto)
 
-        # Padrão 2: SOBRENOME (ano) - autor no início da frase
-        def substituir_inicio_frase(match):
-            nome = match.group(1)
-            resto = match.group(2)
+        return texto
 
-            # Verifica se tem "et al."
-            if 'ET AL' in nome.upper():
-                nome = re.sub(r'\bET\s+AL\.?', 'et al.', nome, flags=re.IGNORECASE)
+    @staticmethod
+    def converter_citacoes_fora_parenteses(texto):
+        """
+        Converte citações FORA de parênteses para maiúsculas também
 
+        Exemplos:
+            Segundo Silva (2022) -> Segundo SILVA (2022)
+            Conforme Junior (2024, p. 15) -> Conforme JUNIOR (2024, p. 15)
+        """
+
+        def substituir_autor_fora(match):
+            prefixo = match.group(1)  # "Segundo", "Conforme", etc.
+            nome = match.group(2)
+            citacao = match.group(3)  # (2022) ou (2024, p. 15)
+
+            # Converte o nome para MAIÚSCULAS, exceto "et al."
             palavras = nome.split()
-            palavras_formatadas = []
+            palavras_maiusculas = []
             for palavra in palavras:
-                if palavra.upper() not in ['ET', 'AL', 'AL.']:
-                    palavras_formatadas.append(palavra.capitalize())
+                if palavra.lower() in ['et', 'al', 'al.']:
+                    palavras_maiusculas.append(palavra.lower())
                 else:
-                    palavras_formatadas.append(palavra.lower())
+                    palavras_maiusculas.append(palavra.upper())
 
-            return f"{' '.join(palavras_formatadas)} {resto}"
+            nome_formatado = ' '.join(palavras_maiusculas)
 
-        texto = re.sub(r'\b([A-ZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ]{2,}(?:\s+[A-ZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ]{2,})*(?:\s+et\s+al\.?)?)\s+(\(\d{4}[a-z]?(?:,\s*p\.\s*\d+(?:-\d+)?)?\))',
-                      substituir_inicio_frase, texto)
+            return f"{prefixo} {nome_formatado} {citacao}"
+
+        # Padrão: "Segundo/Conforme/De acordo com Nome (ano)"
+        padrao = r'\b(Segundo|Conforme|De acordo com|Para)\s+([A-ZÀ-Ü][a-zà-ü]+(?:\s+[a-zà-ü]+)*)\s+(\(\d{4}[a-z]?(?:,\s*p\.\s*\d+(?:-\d+)?)?\))'
+        texto = re.sub(padrao, substituir_autor_fora, texto, flags=re.IGNORECASE)
 
         return texto
 
@@ -95,18 +128,22 @@ class FormatadorCitacoes:
     def converter_multiplos_autores_para_et_al(texto):
         """
         Converte citações com 4+ autores para et al.
-        Exemplo: (Santos; Oliveira; Costa; Lima, 2020) -> (Santos et al., 2020)
+        Exemplo: (SANTOS; OLIVEIRA; COSTA; LIMA, 2020) -> (SANTOS et al., 2020)
         """
+
         def substituir(match):
             conteudo = match.group(1)
+
             # Conta quantos autores tem (separados por ponto e vírgula)
             autores = conteudo.split(';')
 
             # Se tem 4 ou mais autores, mantém apenas o primeiro + et al.
             if len(autores) >= 4:
                 primeiro_autor = autores[0].strip()
+
                 # Remove o ano do primeiro autor se existir
                 primeiro_autor = re.sub(r',\s*\d{4}.*$', '', primeiro_autor).strip()
+
                 # Pega o ano da citação original
                 ano_match = re.search(r',\s*(\d{4}[a-z]?(?:,\s*p\.\s*\d+(?:-\d+)?)?)', conteudo)
                 if ano_match:
@@ -115,32 +152,26 @@ class FormatadorCitacoes:
 
             return match.group(0)
 
-        texto = re.sub(r'\(([A-ZÀ-Ü][a-zà-ü]+(?:\s+[a-zà-ü]+)*(?:;\s*[A-ZÀ-Ü][a-zà-ü]+(?:\s+[a-zà-ü]+)*){3,}[,\s]+\d{4}[a-z]?(?:,\s*p\.\s*\d+(?:-\d+)?)?)\)',
-                      substituir, texto)
+        # Aplica a conversão
+        texto = re.sub(
+            r'\(([A-ZÀ-Ü][A-Za-zÀ-ü]+(?:\s+[a-zà-ü]+)*(?:;\s*[A-ZÀ-Ü][A-Za-zÀ-ü]+(?:\s+[a-zà-ü]+)*){3,}[,\s]+\d{4}[a-z]?(?:,\s*p\.\s*\d+(?:-\d+)?)?)\)',
+            substituir, texto
+        )
 
-        return texto
-
-    @staticmethod
-    def formatar_citacao_longa(texto):
-        """
-        Identifica citações longas (>3 linhas) e adiciona marcador para formatação especial
-        O marcador será usado posteriormente na geração do Word
-        """
-        # Por enquanto, retorna o texto como está
-        # A formatação real será feita no módulo de geração do Word
         return texto
 
     @staticmethod
     def formatar_texto(texto):
-        """Aplica todas as conversões de citações no texto"""
-        # 1. Converte SOBRENOME para Sobrenome
-        texto = FormatadorCitacoes.converter_citacao_maiuscula_para_minuscula(texto)
+        """Aplica todas as formatações de citações no texto"""
 
-        # 2. Converte múltiplos autores (4+) para et al.
+        # 1. Converte múltiplos autores (4+) para et al. PRIMEIRO
         texto = FormatadorCitacoes.converter_multiplos_autores_para_et_al(texto)
 
-        # 3. Identifica citações longas
-        texto = FormatadorCitacoes.formatar_citacao_longa(texto)
+        # 2. Converte citações entre parênteses para MAIÚSCULAS
+        texto = FormatadorCitacoes.converter_citacoes_para_maiusculas(texto)
+
+        # 3. Converte citações fora de parênteses para MAIÚSCULAS
+        texto = FormatadorCitacoes.converter_citacoes_fora_parenteses(texto)
 
         return texto
 
@@ -156,6 +187,8 @@ class FormatadorWord:
         - Fonte: Arial 12
         - Espaçamento: 1,5
         - Alinhamento: Justificado
+        - Resumo: Centralizado
+        - Referências: Títulos em negrito
         """
         doc = Document()
 
@@ -170,48 +203,222 @@ class FormatadorWord:
         # Processar o texto em parágrafos
         paragrafos = texto.split('\n')
 
-        for texto_paragrafo in paragrafos:
-            if texto_paragrafo.strip():
-                # Detectar se é uma citação longa (heurística simples)
-                eh_citacao_longa = FormatadorWord._eh_citacao_longa(texto_paragrafo)
+        i = 0
+        while i < len(paragrafos):
+            texto_paragrafo = paragrafos[i].strip()
 
-                paragrafo = doc.add_paragraph(texto_paragrafo)
-
-                if eh_citacao_longa:
-                    # Formatação para citação longa
-                    FormatadorWord._formatar_citacao_longa(paragrafo)
-                else:
-                    # Formatação padrão
-                    FormatadorWord._formatar_paragrafo_padrao(paragrafo)
-            else:
+            if not texto_paragrafo:
                 # Parágrafo vazio (linha em branco)
                 doc.add_paragraph()
+                i += 1
+                continue
+
+            # Detectar tipo de parágrafo
+            tipo = FormatadorWord._detectar_tipo_paragrafo(texto_paragrafo, paragrafos, i)
+
+            if tipo == 'resumo_titulo':
+                # Título "Resumo" centralizado
+                FormatadorWord._formatar_titulo_resumo(doc, texto_paragrafo)
+
+            elif tipo == 'titulo_secao':
+                # Títulos principais (1 INTRODUÇÃO, 2 DESENVOLVIMENTO, etc.)
+                FormatadorWord._formatar_titulo_secao(doc, texto_paragrafo)
+
+            elif tipo == 'titulo_subsecao':
+                # Subtítulos (2.1, 2.2, etc.) - CONVERTER PARA MAIÚSCULAS
+                FormatadorWord._formatar_titulo_subsecao(doc, texto_paragrafo)
+
+            elif tipo == 'citacao_longa':
+                # Citação longa (>3 linhas)
+                FormatadorWord._formatar_citacao_longa_paragrafo(doc, texto_paragrafo)
+
+            elif tipo == 'referencia':
+                # Referência bibliográfica (aplicar negrito no título)
+                FormatadorWord._formatar_referencia(doc, texto_paragrafo)
+
+            else:
+                # Parágrafo normal
+                FormatadorWord._formatar_paragrafo_padrao(doc, texto_paragrafo)
+
+            i += 1
 
         return doc
 
     @staticmethod
-    def _eh_citacao_longa(texto):
-        """
-        Heurística para detectar citações longas:
-        - Texto entre aspas
-        - Mais de 300 caracteres (aproximadamente 3 linhas)
-        """
-        # Remove espaços para contagem mais precisa
-        texto_limpo = texto.strip()
+    def _detectar_tipo_paragrafo(texto, todos_paragrafos, indice):
+        """Detecta o tipo de parágrafo para aplicar formatação adequada"""
 
-        # Verifica se está entre aspas e tem mais de 300 caracteres
-        if (texto_limpo.startswith('"') or texto_limpo.startswith('"')) and len(texto_limpo) > 300:
-            return True
+        texto_stripped = texto.strip()
 
-        # Verifica se tem indicação de página (comum em citações longas)
-        if re.search(r'\([A-ZÀ-Ü][a-zà-ü]+.*?,\s*\d{4},\s*p\.\s*\d+', texto_limpo) and len(texto_limpo) > 300:
-            return True
+        # Verifica se é o título "Resumo"
+        if texto_stripped.lower() == 'resumo':
+            return 'resumo_titulo'
 
-        return False
+        # Verifica se é título de seção (1 INTRODUÇÃO, 2 DESENVOLVIMENTO, REFERÊNCIAS)
+        if re.match(r'^\d+\s+[A-ZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ\s]+$', texto_stripped):
+            return 'titulo_secao'
+
+        if re.match(r'^[A-ZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ\s]+$', texto_stripped) and len(texto_stripped.split()) <= 5:
+            return 'titulo_secao'
+
+        # Verifica se é subtítulo (2.1 Nome do Subtítulo)
+        if re.match(r'^\d+\.\d+\s+.+', texto_stripped):
+            return 'titulo_subsecao'
+
+        # Verifica se é citação longa (>300 caracteres ou tem marcador específico)
+        if len(texto_stripped) > 300 and ('"' in texto_stripped or '"' in texto_stripped):
+            return 'citacao_longa'
+
+        # Verifica se é referência (começa com SOBRENOME em maiúsculas seguido de ponto)
+        if re.match(r'^[A-ZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ][A-ZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ\s,]+\.', texto_stripped):
+            return 'referencia'
+
+        return 'normal'
 
     @staticmethod
-    def _formatar_paragrafo_padrao(paragrafo):
+    def _formatar_titulo_resumo(doc, texto):
+        """Formata o título 'Resumo' (centralizado, negrito, Arial 12)"""
+        paragrafo = doc.add_paragraph(texto)
+        paragrafo.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        for run in paragrafo.runs:
+            run.font.name = 'Arial'
+            run.font.size = Pt(12)
+            run.font.bold = True
+
+    @staticmethod
+    def _formatar_titulo_secao(doc, texto):
+        """Formata títulos de seção (1 INTRODUÇÃO, etc.) - negrito, maiúsculas"""
+        paragrafo = doc.add_paragraph(texto.upper())
+        paragrafo.alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+        paragrafo_format = paragrafo.paragraph_format
+        paragrafo_format.space_before = Pt(12)
+        paragrafo_format.space_after = Pt(12)
+
+        for run in paragrafo.runs:
+            run.font.name = 'Arial'
+            run.font.size = Pt(12)
+            run.font.bold = True
+
+    @staticmethod
+    def _formatar_titulo_subsecao(doc, texto):
+        """Formata subtítulos (2.1 Nome) - CONVERTER PARA MAIÚSCULAS"""
+        # Extrai número e título
+        match = re.match(r'^(\d+\.\d+)\s+(.+)$', texto)
+        if match:
+            numero = match.group(1)
+            titulo = match.group(2)
+            texto_formatado = f"{numero} {titulo.upper()}"
+        else:
+            texto_formatado = texto.upper()
+
+        paragrafo = doc.add_paragraph(texto_formatado)
+        paragrafo.alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+        paragrafo_format = paragrafo.paragraph_format
+        paragrafo_format.space_before = Pt(12)
+        paragrafo_format.space_after = Pt(6)
+
+        for run in paragrafo.runs:
+            run.font.name = 'Arial'
+            run.font.size = Pt(12)
+            run.font.bold = True
+
+    @staticmethod
+    def _formatar_citacao_longa_paragrafo(doc, texto):
+        """Formata citação longa (recuo 4cm, fonte 10, espaçamento simples, SEM ASPAS)"""
+        # Remove aspas do texto
+        texto_limpo = texto.strip('"').strip('"').strip('"').strip()
+
+        # IMPORTANTE: Preserva a citação se houver no final
+        paragrafo = doc.add_paragraph(texto_limpo)
+
+        # Alinhamento justificado
+        paragrafo.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+
+        # Formato do parágrafo
+        paragrafo_format = paragrafo.paragraph_format
+        paragrafo_format.line_spacing_rule = WD_LINE_SPACING.SINGLE  # Espaçamento simples
+        paragrafo_format.left_indent = Inches(4 / 2.54)  # Recuo de 4 cm
+        paragrafo_format.space_after = Pt(0)
+        paragrafo_format.space_before = Pt(0)
+
+        # Fonte Arial 10
+        for run in paragrafo.runs:
+            run.font.name = 'Arial'
+            run.font.size = Pt(10)
+
+            # Formatar "et al." em itálico
+            if 'et al.' in run.text:
+                partes = run.text.split('et al.')
+                run.text = partes[0]
+
+                for j in range(1, len(partes)):
+                    run_italic = paragrafo.add_run('et al.')
+                    run_italic.italic = True
+                    run_italic.font.name = 'Arial'
+                    run_italic.font.size = Pt(10)
+
+                    if partes[j]:
+                        run_normal = paragrafo.add_run(partes[j])
+                        run_normal.font.name = 'Arial'
+                        run_normal.font.size = Pt(10)
+
+    @staticmethod
+    def _formatar_referencia(doc, texto):
+        """
+        Formata referência bibliográfica com título em NEGRITO
+
+        Exemplo:
+        GARTNER. Top Strategic Technology Trends 2023. ...
+        O título "Top Strategic..." deve ficar em NEGRITO
+        """
+        paragrafo = doc.add_paragraph()
+        paragrafo.alignment = WD_ALIGN_PARAGRAPH.LEFT
+
+        paragrafo_format = paragrafo.paragraph_format
+        paragrafo_format.line_spacing_rule = WD_LINE_SPACING.SINGLE
+        paragrafo_format.space_after = Pt(6)
+
+        # Tenta identificar o título (geralmente entre o primeiro ponto e o segundo ponto, ou após autor e antes do local)
+        # Padrão: AUTOR. Título da obra. Local: Editora, ano.
+
+        # Regex para capturar: AUTOR. TÍTULO. Resto
+        match = re.match(r'^([A-ZÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ][^.]+\.)\s*([^.]+\.)\s*(.*)$', texto)
+
+        if match:
+            autor = match.group(1)
+            titulo = match.group(2)
+            resto = match.group(3)
+
+            # Adiciona autor (normal)
+            run_autor = paragrafo.add_run(autor + ' ')
+            run_autor.font.name = 'Arial'
+            run_autor.font.size = Pt(12)
+
+            # Adiciona título (NEGRITO)
+            run_titulo = paragrafo.add_run(titulo)
+            run_titulo.font.name = 'Arial'
+            run_titulo.font.size = Pt(12)
+            run_titulo.font.bold = True
+
+            # Adiciona resto (normal)
+            if resto:
+                run_resto = paragrafo.add_run(' ' + resto)
+                run_resto.font.name = 'Arial'
+                run_resto.font.size = Pt(12)
+        else:
+            # Se não conseguir separar, formata tudo como texto normal
+            run = paragrafo.add_run(texto)
+            run.font.name = 'Arial'
+            run.font.size = Pt(12)
+
+    @staticmethod
+    def _formatar_paragrafo_padrao(doc, texto):
         """Aplica formatação ABNT padrão ao parágrafo"""
+        paragrafo = doc.add_paragraph(texto)
+
         # Alinhamento justificado
         paragrafo.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
@@ -228,44 +435,19 @@ class FormatadorWord:
 
             # Formatar "et al." em itálico
             if 'et al.' in run.text:
-                texto = run.text
-                # Divide e reformata
-                partes = texto.split('et al.')
+                partes = run.text.split('et al.')
                 run.text = partes[0]
 
-                for i in range(1, len(partes)):
-                    # Adiciona "et al." em itálico
+                for j in range(1, len(partes)):
                     run_italic = paragrafo.add_run('et al.')
                     run_italic.italic = True
                     run_italic.font.name = 'Arial'
                     run_italic.font.size = Pt(12)
 
-                    # Adiciona o resto do texto
-                    if partes[i]:
-                        run_normal = paragrafo.add_run(partes[i])
+                    if partes[j]:
+                        run_normal = paragrafo.add_run(partes[j])
                         run_normal.font.name = 'Arial'
                         run_normal.font.size = Pt(12)
-
-    @staticmethod
-    def _formatar_citacao_longa(paragrafo):
-        """Aplica formatação ABNT para citações longas (>3 linhas)"""
-        # Alinhamento justificado
-        paragrafo.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-
-        # Formato do parágrafo
-        paragrafo_format = paragrafo.paragraph_format
-        paragrafo_format.line_spacing_rule = WD_LINE_SPACING.SINGLE  # Espaçamento simples
-        paragrafo_format.left_indent = Inches(4 / 2.54)  # Recuo de 4 cm
-        paragrafo_format.space_after = Pt(0)
-        paragrafo_format.space_before = Pt(0)
-
-        # Fonte Arial 10
-        for run in paragrafo.runs:
-            run.font.name = 'Arial'
-            run.font.size = Pt(10)
-
-            # Remove aspas se existirem
-            run.text = run.text.strip('"').strip('"').strip('"')
 
     @staticmethod
     def carregar_documento(caminho_arquivo):
@@ -296,7 +478,7 @@ class AplicativoFormatadorABNT:
 
     def __init__(self, root):
         self.root = root
-        self.root.title("📄 Formatador ABNT - Documentos")
+        self.root.title("📄 Formatador ABNT - Documentos (v2.0)")
         self.root.geometry("1200x700")
 
         # Variáveis
@@ -370,7 +552,7 @@ class AplicativoFormatadorABNT:
         btn_copiar_depois.pack(pady=(5, 0))
 
         # Barra de status
-        self.status_bar = ttk.Label(self.root, text="Pronto para formatar documentos",
+        self.status_bar = ttk.Label(self.root, text="✅ v2.0 - Correções aplicadas: citações em MAIÚSCULAS, resumo centralizado, títulos em negrito",
                                    relief=tk.SUNKEN, anchor=tk.W, padding="5")
         self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
 
@@ -431,7 +613,7 @@ class AplicativoFormatadorABNT:
             self.texto_depois.delete(1.0, tk.END)
             self.texto_depois.insert(1.0, texto_formatado)
 
-            self.atualizar_status("✅ Documento formatado com sucesso!")
+            self.atualizar_status("✅ Documento formatado! Citações em MAIÚSCULAS conforme ABNT")
 
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao formatar texto:\n{str(e)}")
@@ -484,7 +666,7 @@ class AplicativoFormatadorABNT:
                 FormatadorWord.salvar_documento(doc, caminho)
 
                 self.atualizar_status(f"✅ Documento salvo: {os.path.basename(caminho)}")
-                messagebox.showinfo("Sucesso", f"Documento salvo com sucesso!\n\n{caminho}")
+                messagebox.showinfo("Sucesso", f"Documento salvo com sucesso!\n\n{caminho}\n\nFormatação aplicada:\n✓ Citações em MAIÚSCULAS\n✓ Resumo centralizado\n✓ Títulos em negrito\n✓ Margens ABNT")
 
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao salvar documento:\n{str(e)}")
