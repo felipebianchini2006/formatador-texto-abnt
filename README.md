@@ -15,9 +15,12 @@ Aplicativo desktop em Python que formata automaticamente documentos Word e texto
 - Inserção direta de texto (copiar/colar)
 
 ✅ **Formatação Automática ABNT**
-- Conversão de citações: `(SILVA, 2022)` → `(Silva, 2022)`
+- **Citações em MAIÚSCULAS:** `(Silva, 2022)` → `(SILVA, 2022)` ✅ ABNT CORRETO
 - Conversão de múltiplos autores (4+) para *et al.*
 - Detecção e formatação de citações longas (>3 linhas)
+- **Resumo centralizado** com título destacado
+- **Referências com títulos em negrito**
+- **Títulos de subseções em MAIÚSCULAS**
 - Aplicação de margens ABNT (3/3/2/2 cm)
 - Fonte Arial 12, espaçamento 1,5, alinhamento justificado
 
@@ -37,9 +40,10 @@ Aplicativo desktop em Python que formata automaticamente documentos Word e texto
 - **Alinhamento:** Justificado
 
 ### NBR 10520:2023 - Citações (Atualizada)
-- **Autor-data:** Apenas inicial maiúscula → `(Silva, 2023)`
+- **Autor-data:** SOBRENOME em MAIÚSCULAS → `(SILVA, 2023)` ✅
 - **Múltiplos autores:** 4+ autores → *et al.* desde a 1ª citação
-- **Citações longas:** Recuo 4cm, fonte 10, espaçamento simples
+- **Citações longas:** Recuo 4cm, fonte 10, espaçamento simples, SEM aspas
+- ***et al.*** sempre em itálico e minúsculas
 
 ### NBR 6023:2025 - Referências
 - Ordem alfabética
@@ -115,17 +119,19 @@ python3 formatador_abnt.py
 
 **ANTES:**
 ```
-A educação transformadora é fundamental (FREIRE, 2021).
-Segundo VYGOTSKY (1978), o desenvolvimento cognitivo ocorre
+A educação transformadora é fundamental (Freire, 2021).
+Segundo Silva (1978), o desenvolvimento cognitivo ocorre
 através da interação social.
 ```
 
 **DEPOIS:**
 ```
-A educação transformadora é fundamental (Freire, 2021).
-Segundo Vygotsky (1978), o desenvolvimento cognitivo ocorre
+A educação transformadora é fundamental (FREIRE, 2021).
+Segundo SILVA (1978), o desenvolvimento cognitivo ocorre
 através da interação social.
 ```
+
+✅ **Correção aplicada:** Citações agora ficam em MAIÚSCULAS conforme ABNT!
 
 ---
 
@@ -133,14 +139,16 @@ através da interação social.
 
 **ANTES:**
 ```
-Diversos estudos comprovam essa hipótese (SANTOS; OLIVEIRA;
-COSTA; FERREIRA, 2020).
+Diversos estudos comprovam essa hipótese (Santos; Oliveira;
+Costa; Ferreira, 2020).
 ```
 
 **DEPOIS:**
 ```
-Diversos estudos comprovam essa hipótese (Santos et al., 2020).
+Diversos estudos comprovam essa hipótese (SANTOS et al., 2020).
 ```
+
+✅ **Correção:** 4+ autores → primeiro autor em MAIÚSCULAS + *et al.*
 
 ---
 
@@ -148,27 +156,32 @@ Diversos estudos comprovam essa hipótese (Santos et al., 2020).
 
 **ANTES:**
 ```
-Conforme SILVA (2023), os dados demonstram crescimento.
-Outros autores concordam (COSTA, 2022; OLIVEIRA; SANTOS;
-LIMA; PEREIRA, 2021).
+Conforme Silva (2023), os dados demonstram crescimento.
+Outros autores concordam (Costa, 2022; Oliveira; Santos;
+Lima; Pereira, 2021).
 ```
 
 **DEPOIS:**
 ```
-Conforme Silva (2023), os dados demonstram crescimento.
-Outros autores concordam (Costa, 2022; Oliveira et al., 2021).
+Conforme SILVA (2023), os dados demonstram crescimento.
+Outros autores concordam (COSTA, 2022; OLIVEIRA et al., 2021).
 ```
+
+✅ **Correção:** Todas as citações agora em MAIÚSCULAS + *et al.* para 4+ autores
 
 ---
 
-## 📋 Casos de Teste
+## 📋 Casos de Teste (Versão 2.0 - Corrigido)
 
 | # | Entrada | Saída Esperada | Status |
 |---|---------|----------------|--------|
-| 1 | `(SILVA, 2022)` | `(Silva, 2022)` | ✅ |
-| 2 | `FREIRE (2021)` | `Freire (2021)` | ✅ |
-| 3 | `(SANTOS; OLIVEIRA; COSTA; LIMA, 2020)` | `(Santos et al., 2020)` | ✅ |
-| 4 | `(SILVA, 2022; COSTA, 2023)` | `(Silva, 2022; Costa, 2023)` | ✅ |
+| 1 | `(Silva, 2022)` | `(SILVA, 2022)` | ✅ |
+| 2 | `(Junior, 2024)` | `(JUNIOR, 2024)` | ✅ |
+| 3 | `Segundo Silva (2021)` | `Segundo SILVA (2021)` | ✅ |
+| 4 | `(Santos; Oliveira; Costa; Lima, 2020)` | `(SANTOS et al., 2020)` | ✅ |
+| 5 | `(Silva, 2022; Costa, 2023)` | `(SILVA, 2022; COSTA, 2023)` | ✅ |
+
+**⚠️ IMPORTANTE:** A versão 2.0 corrigiu o erro crítico da v1.0. Agora as citações ficam corretamente em MAIÚSCULAS conforme a norma ABNT verdadeira!
 
 ---
 
@@ -342,6 +355,49 @@ Economizar tempo de estudantes e pesquisadores na formatação ABNT, com foco es
 
 ---
 
-**Versão:** 1.0
+---
+
+## 🔄 Changelog - Versão 2.0 (CORREÇÕES CRÍTICAS)
+
+### ✅ Problemas Corrigidos
+
+1. **❌ ERRO CRÍTICO CORRIGIDO - Citações:**
+   - **Problema v1.0:** Convertia `(SILVA, 2022)` → `(Silva, 2022)` ❌ ERRADO!
+   - **Correção v2.0:** Converte `(Silva, 2022)` → `(SILVA, 2022)` ✅ CORRETO ABNT!
+   - Citações agora permanecem/convertem para MAIÚSCULAS conforme norma
+
+2. **✅ Título "Resumo" Centralizado:**
+   - Título "Resumo" agora fica centralizado e separado do texto
+   - Formatação em negrito
+
+3. **✅ Referências com Títulos em Negrito:**
+   - Títulos de obras nas referências agora ficam em **negrito**
+   - Exemplo: GARTNER. **Top Strategic Technology Trends 2023**. ...
+
+4. **✅ Títulos de Subseções em MAIÚSCULAS:**
+   - Subtítulos (2.1, 2.2, etc.) convertidos para MAIÚSCULAS
+   - Consistência com títulos principais
+
+5. **✅ Preservação de Citações em Citações Longas:**
+   - Citações longas agora preservam as referências no final
+   - Não remove mais os dados de autor/ano
+
+### 📊 Comparação de Versões
+
+| Recurso | v1.0 | v2.0 |
+|---------|------|------|
+| Citações em MAIÚSCULAS | ❌ Errado | ✅ Correto |
+| Resumo centralizado | ❌ Não | ✅ Sim |
+| Títulos ref. em negrito | ❌ Não | ✅ Sim |
+| Subseções MAIÚSCULAS | ❌ Não | ✅ Sim |
+| Preservar citação longa | ⚠️ Parcial | ✅ Completo |
+
+### 🎯 Recomendação
+
+**Use a versão 2.0!** Todos os documentos formatados com a v1.0 devem ser reprocessados com a v2.0 para garantir conformidade real com ABNT.
+
+---
+
+**Versão:** 2.0 (CORREÇÕES CRÍTICAS APLICADAS)
 **Data:** Novembro 2025
 **Autor:** Claude AI
