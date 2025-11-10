@@ -1,0 +1,135 @@
+EXEMPLO DE TEXTO PARA TESTE DO FORMATADOR ABNT
+================================================
+
+📌 INSTRUÇÕES:
+1. Copie este texto
+2. Cole no Formatador ABNT
+3. Clique em "Formatar ABNT"
+4. Compare os resultados ANTES/DEPOIS
+
+================================================
+
+INTRODUÇÃO
+
+A educação transformadora é fundamental para o desenvolvimento social (FREIRE, 2021). Segundo VYGOTSKY (1978), o desenvolvimento cognitivo ocorre através da interação social e da mediação cultural. Neste contexto, diversos autores têm investigado os processos de ensino-aprendizagem.
+
+Conforme aponta PIAGET (1973, p. 45), "a inteligência não é uma faculdade estática, mas um processo em constante construção". Esta perspectiva construtivista influenciou profundamente as práticas pedagógicas contemporâneas (BECKER, 2001; COLL, 1994; POZO, 1998; GARDNER, 1995).
+
+DESENVOLVIMENTO
+
+De acordo com SANTOS; OLIVEIRA; COSTA; LIMA (2020), as metodologias ativas têm demonstrado resultados significativos no engajamento estudantil. Esta afirmação é corroborada por MORAN (2018), que destaca a importância da autonomia discente no processo educacional.
+
+Conforme DEMO (2015, p. 78):
+"A pesquisa como princípio educativo representa uma mudança paradigmática fundamental na educação contemporânea. Não se trata apenas de uma metodologia, mas de uma filosofia educacional que coloca o estudante no centro do processo de construção do conhecimento, incentivando a curiosidade, o pensamento crítico e a capacidade de questionar as verdades estabelecidas."
+
+Os estudos de VALENTE; ALMEIDA; GERALDINI (2017) demonstram que a integração de tecnologias digitais no ensino requer formação adequada dos professores. Segundo BACICH; TANZI NETO; TREVISANI (2015), o ensino híbrido combina atividades presenciais e online de forma integrada.
+
+TARDIF (2014) argumenta que os saberes docentes são plurais e heterogêneos. Esta perspectiva é compartilhada por NÓVOA (2019), que enfatiza a importância da reflexão sobre a prática profissional. Diversos pesquisadores concordam com esta abordagem (PERRENOUD, 2002; SCHÖN, 2000; ZEICHNER, 1993; ALARCÃO, 2011).
+
+A interdisciplinaridade, conforme FAZENDA (2008), promove diálogos entre diferentes áreas do conhecimento. MORIN (2000) complementa ao afirmar que o pensamento complexo é essencial para compreender os fenômenos educacionais.
+
+CONSIDERAÇÕES FINAIS
+
+Os estudos analisados evidenciam que a educação contemporânea demanda novas abordagens pedagógicas (LIBÂNEO, 2013). Como afirma SAVIANI (2011, p. 112), "a escola deve formar indivíduos capazes de pensar criticamente e agir transformadoramente na sociedade". Portanto, as práticas educativas necessitam contemplar a diversidade e a inclusão (MANTOAN, 2003; CARVALHO, 2016; GLAT; PLETSCH, 2012; RODRIGUES, 2014).
+
+================================================
+
+CASOS DE TESTE ESPECÍFICOS:
+
+1. CITAÇÃO SIMPLES EM MAIÚSCULAS:
+   Original: (SILVA, 2022)
+   Esperado: (Silva, 2022)
+
+2. AUTOR NO INÍCIO DA FRASE:
+   Original: FREIRE (2021) defende que...
+   Esperado: Freire (2021) defende que...
+
+3. MÚLTIPLOS AUTORES (4+):
+   Original: (SANTOS; OLIVEIRA; COSTA; LIMA, 2020)
+   Esperado: (Santos et al., 2020)
+
+4. CITAÇÕES MÚLTIPLAS:
+   Original: (BECKER, 2001; COLL, 1994; POZO, 1998; GARDNER, 1995)
+   Esperado: (Becker, 2001; Coll, 1994; Pozo, 1998; Gardner, 1995)
+
+5. CITAÇÃO COM PÁGINA:
+   Original: Segundo PIAGET (1973, p. 45)
+   Esperado: Segundo Piaget (1973, p. 45)
+
+6. CITAÇÃO LONGA (>3 linhas):
+   Original: Texto entre aspas com mais de 300 caracteres
+   Esperado: Texto formatado com recuo 4cm, fonte 10, sem aspas
+
+7. AUTORES COMPOSTOS:
+   Original: (TARDIF, 2014) e (NÓVOA, 2019)
+   Esperado: (Tardif, 2014) e (Nóvoa, 2019)
+
+================================================
+
+REFERÊNCIAS
+
+ALARCÃO, Isabel. Professores reflexivos em uma escola reflexiva. São Paulo: Cortez, 2011.
+
+BACICH, Lilian; TANZI NETO, Adolfo; TREVISANI, Fernando de Mello. Ensino híbrido: personalização e tecnologia na educação. Porto Alegre: Penso, 2015.
+
+BECKER, Fernando. Educação e construção do conhecimento. Porto Alegre: Artmed, 2001.
+
+CARVALHO, Rosita Edler. Educação inclusiva: com os pingos nos "is". Porto Alegre: Mediação, 2016.
+
+COLL, César. Aprendizagem escolar e construção do conhecimento. Porto Alegre: Artmed, 1994.
+
+DEMO, Pedro. Educar pela pesquisa. Campinas: Autores Associados, 2015.
+
+FAZENDA, Ivani Catarina Arantes. Interdisciplinaridade: história, teoria e pesquisa. Campinas: Papirus, 2008.
+
+FREIRE, Paulo. Pedagogia do oprimido. Rio de Janeiro: Paz e Terra, 2021.
+
+GARDNER, Howard. Inteligências múltiplas: a teoria na prática. Porto Alegre: Artmed, 1995.
+
+GLAT, Rosana; PLETSCH, Márcia Denise. Inclusão escolar de alunos com necessidades especiais. Rio de Janeiro: EdUERJ, 2012.
+
+LIBÂNEO, José Carlos. Didática. São Paulo: Cortez, 2013.
+
+MANTOAN, Maria Teresa Eglér. Inclusão escolar: o que é? por quê? como fazer? São Paulo: Moderna, 2003.
+
+MORAN, José. Metodologias ativas para uma aprendizagem mais profunda. In: BACICH, Lilian; MORAN, José (Orgs.). Metodologias ativas para uma educação inovadora. Porto Alegre: Penso, 2018. p. 02-25.
+
+MORIN, Edgar. Os sete saberes necessários à educação do futuro. São Paulo: Cortez, 2000.
+
+NÓVOA, António. Os professores e a sua formação num tempo de metamorfose da escola. Educação & Realidade, Porto Alegre, v. 44, n. 3, p. 1-15, 2019.
+
+PERRENOUD, Philippe. A prática reflexiva no ofício de professor. Porto Alegre: Artmed, 2002.
+
+PIAGET, Jean. Estudos sociológicos. Rio de Janeiro: Forense, 1973.
+
+POZO, Juan Ignacio. Teorias cognitivas da aprendizagem. Porto Alegre: Artmed, 1998.
+
+RODRIGUES, David (Org.). Inclusão e educação: doze olhares sobre a educação inclusiva. São Paulo: Summus, 2014.
+
+SANTOS, Ana Paula; OLIVEIRA, Carlos Eduardo; COSTA, Maria Fernanda; LIMA, João Pedro. Metodologias ativas no ensino superior: desafios e perspectivas. Revista Educação & Sociedade, Campinas, v. 41, p. 1-18, 2020.
+
+SAVIANI, Dermeval. Pedagogia histórico-crítica: primeiras aproximações. Campinas: Autores Associados, 2011.
+
+SCHÖN, Donald. Educando o profissional reflexivo: um novo design para o ensino e a aprendizagem. Porto Alegre: Artmed, 2000.
+
+TARDIF, Maurice. Saberes docentes e formação profissional. Petrópolis: Vozes, 2014.
+
+VALENTE, José Armando; ALMEIDA, Maria Elizabeth Bianconcini de; GERALDINI, Alexandra Fogli Serpa. Metodologias ativas: das concepções às práticas em distintos níveis de ensino. Revista Diálogo Educacional, Curitiba, v. 17, n. 52, p. 455-478, 2017.
+
+VYGOTSKY, Lev Semenovich. A formação social da mente. São Paulo: Martins Fontes, 1978.
+
+ZEICHNER, Kenneth M. A formação reflexiva de professores: ideias e práticas. Lisboa: Educa, 1993.
+
+================================================
+
+✅ ESTE ARQUIVO CONTÉM:
+- Texto acadêmico completo com citações em formato INCORRETO (MAIÚSCULAS)
+- Citações diretas curtas e longas
+- Múltiplos autores
+- Citações com páginas
+- Referências bibliográficas completas
+- Casos de teste específicos
+
+🎯 OBJETIVO: Testar todas as funcionalidades do Formatador ABNT
+
+================================================
